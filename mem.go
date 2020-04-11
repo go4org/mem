@@ -53,13 +53,17 @@ func (r RO) Append(dest []byte) []byte { return append(dest, r.m...) }
 func (r RO) Equal(r2 RO) bool          { return r.m == r2.m }
 func (r RO) EqualString(s string) bool { return string(r.m) == s }
 func (r RO) EqualBytes(b []byte) bool  { return string(r.m) == string(b) }
-func (r RO) Reader() *Reader           { return &Reader{sr: strings.NewReader(string(r.m))} }
 
 func (r RO) ParseInt(base, bitSize int) (int64, error) {
 	return strconv.ParseInt(string(r.m), base, bitSize)
 }
 func (r RO) ParseUint(base, bitSize int) (uint64, error) {
 	return strconv.ParseUint(string(r.m), base, bitSize)
+}
+
+// NewReader returns a new Reader that reads from m.
+func NewReader(m RO) *Reader {
+	return &Reader{sr: strings.NewReader(string(m.m))}
 }
 
 // Reader is like a bytes.Reader or strings.Reader.
