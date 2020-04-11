@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package mem provides access to bytes in memory.
+// Package mem provides the mem.RO type that allows you to cheaply pass &
+// access either a read-only []byte or a string.
 package mem // import "go4.org/mem"
 
 import (
@@ -28,6 +29,15 @@ import (
 // guaranteed to be immutable. While the length is fixed, the
 // underlying bytes might change if interleaved with code that's
 // modifying the underlying memory.
+//
+// RO is a value type that's the same size of a Go string. Its various
+// methods should inline & compile to the equivalent operations
+// working on a string or []byte directly.
+//
+// Unlike a Go string, RO is not 'comparable' (it can't be a map key
+// or support ==). Use its Equal method to compare. This is done so an
+// RO backed by a later-mutating []byte doesn't break invariants in
+// Go's map implementation.
 type RO struct {
 	_ [0]func() // not comparable; don't want to be a map key or support ==
 	m unsafeString
@@ -73,9 +83,18 @@ func (r *Reader) Seek(offset int64, whence int) (int64, error) { return r.sr.See
 type unsafeString string
 
 // S returns a read-only view of the string s.
+//
+// The compiler should compile this call to nothing. Think of it as a
+// free type conversion. The returned RO view is the same size as a
+// string.
 func S(s string) RO { return RO{m: unsafeString(s)} }
 
 // B returns a read-only view of the byte slice b.
+//
+// The compiler should compile this call to nothing. Think of it as a
+// free type conversion. The returned value is actually smaller than a
+// []byte though (16 bytes instead of 24 bytes on 64-bit
+// architectures).
 func B(b []byte) RO {
 	if len(b) == 0 {
 		return RO{m: ""}
