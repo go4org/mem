@@ -43,20 +43,47 @@ type RO struct {
 	m unsafeString
 }
 
-func (r RO) Len() int                  { return len(r.m) }
-func (r RO) At(i int) byte             { return r.m[i] }
-func (r RO) Slice(from, to int) RO     { return RO{m: r.m[from:to]} }
-func (r RO) SliceFrom(from int) RO     { return RO{m: r.m[from:]} }
-func (r RO) SliceTo(to int) RO         { return RO{m: r.m[:to]} }
-func (r RO) Copy(dest []byte) int      { return copy(dest, r.m) }
-func (r RO) Append(dest []byte) []byte { return append(dest, r.m...) }
-func (r RO) Equal(r2 RO) bool          { return r.m == r2.m }
-func (r RO) EqualString(s string) bool { return string(r.m) == s }
-func (r RO) EqualBytes(b []byte) bool  { return string(r.m) == string(b) }
+// Len returns len(r).
+func (r RO) Len() int { return len(r.m) }
 
+// At returns r[i].
+func (r RO) At(i int) byte { return r.m[i] }
+
+// Slice returns r[from:to].
+func (r RO) Slice(from, to int) RO { return RO{m: r.m[from:to]} }
+
+// SliceFrom returns r[from:].
+func (r RO) SliceFrom(from int) RO { return RO{m: r.m[from:]} }
+
+// SliceTo returns r[:to].
+func (r RO) SliceTo(to int) RO { return RO{m: r.m[:to]} }
+
+// Copy copies up to len(dest) bytes into dest from r and returns the
+// number of bytes copied, the min(r.Len(), len(dest)).
+func (r RO) Copy(dest []byte) int { return copy(dest, r.m) }
+
+// Append appends r to dest, and returns the possibly-reallocated
+// dest.
+func (r RO) Append(dest []byte) []byte { return append(dest, r.m...) }
+
+// Equal reports whether r and r2 are the same length and contain the
+// same bytes.
+func (r RO) Equal(r2 RO) bool { return r.m == r2.m }
+
+// EqualString reports whether r and s are the same length and contain
+// the same bytes.
+func (r RO) EqualString(s string) bool { return string(r.m) == s }
+
+// EqualBytes reports whether r and b are the same length and contain
+// the same bytes.
+func (r RO) EqualBytes(b []byte) bool { return string(r.m) == string(b) }
+
+// ParseInt returns a signed integer from r, using strconv.ParseInt.
 func (r RO) ParseInt(base, bitSize int) (int64, error) {
 	return strconv.ParseInt(string(r.m), base, bitSize)
 }
+
+// ParseUint returns a unsigned integer from r, using strconv.ParseUint.
 func (r RO) ParseUint(base, bitSize int) (uint64, error) {
 	return strconv.ParseUint(string(r.m), base, bitSize)
 }
