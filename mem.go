@@ -62,10 +62,6 @@ func (r RO) SliceTo(to int) RO { return RO{m: r.m[:to]} }
 // number of bytes copied, the min(r.Len(), len(dest)).
 func (r RO) Copy(dest []byte) int { return copy(dest, r.m) }
 
-// Append appends r to dest, and returns the possibly-reallocated
-// dest.
-func (r RO) Append(dest []byte) []byte { return append(dest, r.m...) }
-
 // Equal reports whether r and r2 are the same length and contain the
 // same bytes.
 func (r RO) Equal(r2 RO) bool { return r.m == r2.m }
@@ -87,6 +83,10 @@ func (r RO) ParseInt(base, bitSize int) (int64, error) {
 func (r RO) ParseUint(base, bitSize int) (uint64, error) {
 	return strconv.ParseUint(string(r.m), base, bitSize)
 }
+
+// Append appends m to dest, and returns the possibly-reallocated
+// dest.
+func Append(dest []byte, m RO) []byte { return append(dest, m.m...) }
 
 // NewReader returns a new Reader that reads from m.
 func NewReader(m RO) *Reader {

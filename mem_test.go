@@ -48,8 +48,8 @@ func TestRO(t *testing.T) {
 	}
 
 	var got []byte
-	got = rb.Append(got)
-	got = rs.Append(got)
+	got = Append(got, rb)
+	got = Append(got, rs)
 	want := "zome memory.some memory."
 	if string(got) != want {
 		t.Errorf("got %q; want %q", got, want)
