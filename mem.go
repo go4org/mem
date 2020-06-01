@@ -43,6 +43,12 @@ type RO struct {
 	m unsafeString
 }
 
+// str returns the unsafeString as a string. Only for us with standard
+// library funcs known to not let the string escape, as it doesn't
+// obey the language/runtime's expectations of a real string (it can
+// change underfoot).
+func (r RO) str() string { return string(r.m) }
+
 // Len returns len(r).
 func (r RO) Len() int { return len(r.m) }
 
@@ -68,29 +74,115 @@ func (r RO) Equal(r2 RO) bool { return r.m == r2.m }
 
 // EqualString reports whether r and s are the same length and contain
 // the same bytes.
-func (r RO) EqualString(s string) bool { return string(r.m) == s }
+func (r RO) EqualString(s string) bool { return r.str() == s }
 
 // EqualBytes reports whether r and b are the same length and contain
 // the same bytes.
-func (r RO) EqualBytes(b []byte) bool { return string(r.m) == string(b) }
+func (r RO) EqualBytes(b []byte) bool { return r.str() == string(b) }
 
 // ParseInt returns a signed integer from r, using strconv.ParseInt.
 func (r RO) ParseInt(base, bitSize int) (int64, error) {
-	return strconv.ParseInt(string(r.m), base, bitSize)
+	return strconv.ParseInt(r.str(), base, bitSize)
 }
 
 // ParseUint returns a unsigned integer from r, using strconv.ParseUint.
 func (r RO) ParseUint(base, bitSize int) (uint64, error) {
-	return strconv.ParseUint(string(r.m), base, bitSize)
+	return strconv.ParseUint(r.str(), base, bitSize)
 }
 
 // Append appends m to dest, and returns the possibly-reallocated
 // dest.
 func Append(dest []byte, m RO) []byte { return append(dest, m.m...) }
 
+// Contains reports whether substr is within m.
+func Contains(m, substr RO) bool { return strings.Contains(m.str(), substr.str()) }
+
+// EqualFold reports whether s and t, interpreted as UTF-8 strings,
+// are equal under Unicode case-folding, which is a more general form
+// of case-insensitivity.
+func EqualFold(m, m2 RO) bool { return strings.EqualFold(m.str(), m2.str()) }
+
+// HasPrefix reports whether m starts with prefix.
+func HasPrefix(m, prefix RO) bool { return strings.HasPrefix(m.str(), prefix.str()) }
+
+// HasSuffix reports whether m ends with suffix.
+func HasSuffix(m, suffix RO) bool { return strings.HasSuffix(m.str(), suffix.str()) }
+
+// Index returns the index of the first instance of substr in m, or -1
+// if substr is not present in m.
+func Index(m, substr RO) int { return strings.Index(m.str(), substr.str()) }
+
+// IndexByte returns the index of the first instance of c in m, or -1
+// if c is not present in m.
+func IndexByte(m RO, c byte) int { return strings.IndexByte(m.str(), c) }
+
+// LastIndexByte returns the index into m of the last Unicode code
+// point satisfying f(c), or -1 if none do.
+func LastIndexByte(m RO, c byte) int { return strings.LastIndexByte(m.str(), c) }
+
+// LastIndex returns the index of the last instance of substr in m, or
+// -1 if substr is not present in m.
+func LastIndex(m, substr RO) int { return strings.LastIndex(m.str(), substr.str()) }
+
+// TrimSpace returns a slice of the string s, with all leading and
+// trailing white space removed, as defined by Unicode.
+func TrimSpace(m RO) RO { return S(strings.TrimSpace(m.str())) }
+
+// TrimSuffix returns m without the provided trailing suffix.
+// If m doesn't end with suffix, m is returned unchanged.
+func TrimSuffix(m, suffix RO) RO {
+	return S(strings.TrimSuffix(m.str(), suffix.str()))
+}
+
+// TrimPrefix returns m without the provided leading prefix.
+// If m doesn't start with prefix, m is returned unchanged.
+func TrimPrefix(m, prefix RO) RO {
+	return S(strings.TrimPrefix(m.str(), prefix.str()))
+}
+
+// TrimRightCutset returns a slice of m with all trailing Unicode code
+// points contained in cutset removed.
+//
+// To remove a suffix, use TrimSuffix instead.
+func TrimRightCutset(m, cutset RO) RO {
+	return S(strings.TrimRight(m.str(), cutset.str()))
+}
+
+// TrimLeftCutset returns a slice of m with all leading Unicode code
+// points contained in cutset removed.
+//
+// To remove a prefix, use TrimPrefix instead.
+func TrimLeftCutset(m, cutset RO) RO {
+	return S(strings.TrimLeft(m.str(), cutset.str()))
+}
+
+// TrimCutset returns a slice of the string s with all leading and
+// trailing Unicode code points contained in cutset removed.
+func TrimCutset(m, cutset RO) RO {
+	return S(strings.Trim(m.str(), cutset.str()))
+}
+
+// TrimFunc returns a slice of m with all leading and trailing Unicode
+// code points c satisfying f(c) removed.
+func TrimFunc(m RO, f func(rune) bool) RO {
+	return S(strings.TrimFunc(m.str(), f))
+}
+
+// TrimRightFunc returns a slice of m with all trailing Unicode
+// code points c satisfying f(c) removed.
+func TrimRightFunc(m RO, f func(rune) bool) RO {
+	return S(strings.TrimRightFunc(m.str(), f))
+}
+
+// TrimLeftFunc returns a slice of m with all leading Unicode
+// code points c satisfying f(c) removed.
+func TrimLeftFunc(m RO, f func(rune) bool) RO {
+	return S(strings.TrimLeftFunc(m.str(), f))
+}
+
 // NewReader returns a new Reader that reads from m.
 func NewReader(m RO) *Reader {
-	return &Reader{sr: strings.NewReader(string(m.m))}
+	return &Reader{sr: strings.NewReader(m.str())}
 }
 
 // Reader is like a bytes.Reader or strings.Reader.
