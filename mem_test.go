@@ -71,7 +71,7 @@ func TestAllocs(t *testing.T) {
 
 func TestStrconv(t *testing.T) {
 	b := []byte("1234")
-	i, err := B(b).ParseInt(10, 64)
+	i, err := ParseInt(B(b), 10, 64)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -80,14 +80,14 @@ func (r RO) EqualString(s string) bool { return r.str() == s }
 // the same bytes.
 func (r RO) EqualBytes(b []byte) bool { return r.str() == string(b) }
 
-// ParseInt returns a signed integer from r, using strconv.ParseInt.
-func (r RO) ParseInt(base, bitSize int) (int64, error) {
-	return strconv.ParseInt(r.str(), base, bitSize)
+// ParseInt returns a signed integer from m, using strconv.ParseInt.
+func ParseInt(m RO, base, bitSize int) (int64, error) {
+	return strconv.ParseInt(m.str(), base, bitSize)
 }
 
-// ParseUint returns a unsigned integer from r, using strconv.ParseUint.
-func (r RO) ParseUint(base, bitSize int) (uint64, error) {
-	return strconv.ParseUint(r.str(), base, bitSize)
+// ParseUint returns a unsigned integer from m, using strconv.ParseUint.
+func ParseUint(m RO, base, bitSize int) (uint64, error) {
+	return strconv.ParseUint(m.str(), base, bitSize)
 }
 
 // Append appends m to dest, and returns the possibly-reallocated
