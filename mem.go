@@ -205,6 +205,13 @@ func (r *Reader) Seek(offset int64, whence int) (int64, error) { return r.sr.See
 // We contain the unsafety to this package.
 type unsafeString string
 
+// stringHeader is a safer version of reflect.StringHeader.
+// See https://github.com/golang/go/issues/40701.
+type stringHeader struct {
+	P   *byte
+	Len int
+}
+
 // S returns a read-only view of the string s.
 //
 // The compiler should compile this call to nothing. Think of it as a
@@ -221,10 +228,6 @@ func S(s string) RO { return RO{m: unsafeString(s)} }
 func B(b []byte) RO {
 	if len(b) == 0 {
 		return RO{m: ""}
-	}
-	type stringHeader struct {
-		P   *byte
-		Len int
 	}
 	return RO{m: *(*unsafeString)(unsafe.Pointer(&stringHeader{&b[0], len(b)}))}
 }
