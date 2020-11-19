@@ -65,9 +65,23 @@ func TestAllocs(t *testing.T) {
 		}
 	}))
 	if n != 0 {
-		t.Errorf("unexpected allocs (%d)", n)
+		t.Errorf("B: unexpected allocs (%d)", n)
+	}
+
+	ro := B(b)
+	s := string(b)
+	n = uint(testing.AllocsPerRun(5000, func() {
+		globalString = ro.StringCopy()
+		if globalString != s {
+			t.Fatal("wrong string")
+		}
+	}))
+	if n != 1 {
+		t.Errorf("StringCopy: unexpected allocs (%d)", n)
 	}
 }
+
+var globalString string
 
 func TestStrconv(t *testing.T) {
 	b := []byte("1234")
@@ -77,5 +91,13 @@ func TestStrconv(t *testing.T) {
 	}
 	if i != 1234 {
 		t.Errorf("got %d; want 1234", i)
+	}
+}
+
+func BenchmarkStringCopy(b *testing.B) {
+	b.ReportAllocs()
+	ro := S("only a fool starts a large fire.")
+	for i := 0; i < b.N; i++ {
+		globalString = ro.StringCopy()
 	}
 }
