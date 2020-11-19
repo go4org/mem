@@ -19,6 +19,7 @@ limitations under the License.
 package mem // import "go4.org/mem"
 
 import (
+	"hash/maphash"
 	"strconv"
 	"strings"
 	"sync"
@@ -94,6 +95,17 @@ func (r RO) StringCopy() string {
 	defer buf.Reset()
 	buf.WriteString(r.str())
 	return buf.String()
+}
+
+var seed = maphash.MakeSeed()
+
+// MapHash returns a hash of r's contents using runtime/maphash.
+// The hash is stable for the lifetime of a process.
+func (r RO) MapHash() uint64 {
+	var hash maphash.Hash
+	hash.SetSeed(seed)
+	hash.WriteString(r.str())
+	return hash.Sum64()
 }
 
 // ParseInt returns a signed integer from m, using strconv.ParseInt.
