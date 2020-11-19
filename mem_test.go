@@ -101,3 +101,14 @@ func BenchmarkStringCopy(b *testing.B) {
 		globalString = ro.StringCopy()
 	}
 }
+
+func BenchmarkHash(b *testing.B) {
+	b.ReportAllocs()
+	ro := S("A man with a beard was always a little suspect anyway.")
+	x := ro.MapHash()
+	for i := 0; i < b.N; i++ {
+		if x != ro.MapHash() {
+			b.Fatal("hash changed")
+		}
+	}
+}
