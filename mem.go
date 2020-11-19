@@ -43,7 +43,7 @@ type RO struct {
 	m unsafeString
 }
 
-// str returns the unsafeString as a string. Only for us with standard
+// str returns the unsafeString as a string. Only for use with standard
 // library funcs known to not let the string escape, as it doesn't
 // obey the language/runtime's expectations of a real string (it can
 // change underfoot).
