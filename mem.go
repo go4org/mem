@@ -21,6 +21,7 @@ package mem // import "go4.org/mem"
 import (
 	"strconv"
 	"strings"
+	"sync"
 	"unsafe"
 )
 
@@ -79,6 +80,21 @@ func (r RO) EqualString(s string) bool { return r.str() == s }
 // EqualBytes reports whether r and b are the same length and contain
 // the same bytes.
 func (r RO) EqualBytes(b []byte) bool { return r.str() == string(b) }
+
+var builderPool = sync.Pool{
+	New: func() interface{} {
+		return new(strings.Builder)
+	},
+}
+
+// StringCopy returns m's contents in a newly allocated string.
+func (r RO) StringCopy() string {
+	buf := builderPool.Get().(*strings.Builder)
+	defer builderPool.Put(buf)
+	defer buf.Reset()
+	buf.WriteString(r.str())
+	return buf.String()
+}
 
 // ParseInt returns a signed integer from m, using strconv.ParseInt.
 func ParseInt(m RO, base, bitSize int) (int64, error) {
