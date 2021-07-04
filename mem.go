@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 	"unsafe"
 )
 
@@ -206,6 +207,49 @@ func TrimRightFunc(m RO, f func(rune) bool) RO {
 // code points c satisfying f(c) removed.
 func TrimLeftFunc(m RO, f func(rune) bool) RO {
 	return S(strings.TrimLeftFunc(m.str(), f))
+}
+
+// Documentation for UTF-8 related functions copied from Go's unicode/utf8 package. (BSD license)
+
+// DecodeRune unpacks the first UTF-8 encoding in m and returns the rune and
+// its width in bytes. If m is empty it returns (utf8.RuneError, 0). Otherwise, if
+// the encoding is invalid, it returns (utf8.RuneError, 1). Both are impossible
+// results for correct, non-empty UTF-8.
+//
+// An encoding is invalid if it is incorrect UTF-8, encodes a rune that is
+// out of range, or is not the shortest possible UTF-8 encoding for the
+// value. No other validation is performed.
+func DecodeRune(m RO) (r rune, size int) {
+	return utf8.DecodeRuneInString(m.str())
+}
+
+// DecodeLastRune unpacks the last UTF-8 encoding in m and returns the rune and
+// its width in bytes. If m is empty it returns (utf8.RuneError, 0). Otherwise, if
+// the encoding is invalid, it returns (utf8.RuneError, 1). Both are impossible
+// results for correct, non-empty UTF-8.
+//
+// An encoding is invalid if it is incorrect UTF-8, encodes a rune that is
+// out of range, or is not the shortest possible UTF-8 encoding for the
+// value. No other validation is performed.
+func DecodeLastRune(m RO) (r rune, size int) {
+	return utf8.DecodeLastRuneInString(m.str())
+}
+
+// FullRune reports whether the bytes in m begin with a full UTF-8 encoding of a rune.
+// An invalid encoding is considered a full Rune since it will convert as a width-1 error rune.
+func FullRune(m RO) bool {
+	return utf8.FullRuneInString(m.str())
+}
+
+// RuneCount returns the number of UTF-8 encoded runes in m. Erroneous and short
+// encodings are treated as single runes of width 1 byte.
+func RuneCount(m RO) int {
+	return utf8.RuneCountInString(m.str())
+}
+
+// ValidUTF8 reports whether m consists entirely of valid UTF-8 encoded runes.
+func ValidUTF8(m RO) bool {
+	return utf8.ValidString(m.str())
 }
 
 // NewReader returns a new Reader that reads from m.
