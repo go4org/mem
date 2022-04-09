@@ -83,6 +83,9 @@ func (r RO) EqualString(s string) bool { return r.str() == s }
 // the same bytes.
 func (r RO) EqualBytes(b []byte) bool { return r.str() == string(b) }
 
+// Less reports whether r < r2.
+func (r RO) Less(r2 RO) bool { return r.str() < r2.str() }
+
 var builderPool = sync.Pool{
 	New: func() interface{} {
 		return new(strings.Builder)

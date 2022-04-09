@@ -38,6 +38,18 @@ func TestRO(t *testing.T) {
 	if !rs.EqualString(s) {
 		t.Errorf("not equal string")
 	}
+	if rb.Less(rs) {
+		t.Errorf("bad less")
+	}
+	if rs.Less(rb) {
+		t.Errorf("bad less")
+	}
+	if !rs.Less(S("~")) {
+		t.Errorf("bad less")
+	}
+	if !rb.Less(S("~")) {
+		t.Errorf("bad less")
+	}
 
 	if rb.At(0) != 's' {
 		t.Fatalf("[0] = %q; want 's'", rb.At(0))
