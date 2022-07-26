@@ -122,6 +122,11 @@ func ParseUint(m RO, base, bitSize int) (uint64, error) {
 	return strconv.ParseUint(m.str(), base, bitSize)
 }
 
+// ParseFloat returns a float from, using strconv.ParseFloat.
+func ParseFloat(m RO, bitSize int) (float64, error) {
+	return strconv.ParseFloat(m.str(), bitSize)
+}
+
 // Append appends m to dest, and returns the possibly-reallocated
 // dest.
 func Append(dest []byte, m RO) []byte { return append(dest, m.m...) }
