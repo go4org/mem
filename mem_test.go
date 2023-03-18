@@ -66,6 +66,7 @@ func TestRO(t *testing.T) {
 	if string(got) != want {
 		t.Errorf("got %q; want %q", got, want)
 	}
+
 }
 
 func TestAllocs(t *testing.T) {
@@ -103,6 +104,72 @@ func TestStrconv(t *testing.T) {
 	}
 	if i != 1234 {
 		t.Errorf("got %d; want 1234", i)
+	}
+}
+
+var cutTests = []struct {
+	s, sep        string
+	before, after string
+	found         bool
+}{
+	{"abc", "b", "a", "c", true},
+	{"abc", "a", "", "bc", true},
+	{"abc", "c", "ab", "", true},
+	{"abc", "abc", "", "", true},
+	{"abc", "", "", "abc", true},
+	{"abc", "d", "abc", "", false},
+	{"", "d", "", "", false},
+	{"", "", "", "", true},
+}
+
+func TestCut(t *testing.T) {
+	for _, tt := range cutTests {
+		if before, after, found := Cut(S(tt.s), S(tt.sep)); !before.Equal(S(tt.before)) || !after.Equal(S(tt.after)) || found != tt.found {
+			t.Errorf("Cut(%q, %q) = %q, %q, %v, want %q, %q, %v", tt.s, tt.sep, before.StringCopy(), after.StringCopy(), found, tt.before, tt.after, tt.found)
+		}
+	}
+}
+
+var cutPrefixTests = []struct {
+	s, sep string
+	after  string
+	found  bool
+}{
+	{"abc", "a", "bc", true},
+	{"abc", "abc", "", true},
+	{"abc", "", "abc", true},
+	{"abc", "d", "abc", false},
+	{"", "d", "", false},
+	{"", "", "", true},
+}
+
+func TestCutPrefix(t *testing.T) {
+	for _, tt := range cutPrefixTests {
+		s, sep := S(tt.s), S(tt.sep)
+		if after, found := CutPrefix(s, sep); !after.Equal(S(tt.after)) || found != tt.found {
+			t.Errorf("CutPrefix(%q, %q) = %q, %v, want %q, %v", tt.s, tt.sep, after.StringCopy(), found, tt.after, tt.found)
+		}
+	}
+}
+
+var cutSuffixTests = []struct {
+	s, sep string
+	after  string
+	found  bool
+}{
+	{"abc", "bc", "a", true},
+	{"abc", "abc", "", true},
+	{"abc", "", "abc", true},
+	{"abc", "d", "abc", false},
+	{"", "d", "", false},
+	{"", "", "", true},
+}
+
+func TestCutSuffix(t *testing.T) {
+	for _, tt := range cutSuffixTests {
+		if after, found := CutSuffix(S(tt.s), S(tt.sep)); !after.Equal(S(tt.after)) || found != tt.found {
+			t.Errorf("CutSuffix(%q, %q) = %q, %v, want %q, %v", tt.s, tt.sep, after.StringCopy(), found, tt.after, tt.found)
+		}
 	}
 }
 
