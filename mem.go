@@ -273,6 +273,7 @@ func Cut(m, sep RO) (before, after RO, found bool) {
 	return m, S(""), false
 }
 
+// CutPrefix works like strings.CutPrefix, but takes and returns ROs.
 func CutPrefix(m, prefix RO) (after RO, found bool) {
 	if !HasPrefix(m, prefix) {
 		return m, false
@@ -280,6 +281,7 @@ func CutPrefix(m, prefix RO) (after RO, found bool) {
 	return m.SliceFrom(prefix.Len()), true
 }
 
+// CutSuffix works like strings.CutSuffix, but takes and returns ROs.
 func CutSuffix(m, suffix RO) (before RO, found bool) {
 	if !HasSuffix(m, suffix) {
 		return m, false
