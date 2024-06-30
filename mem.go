@@ -299,8 +299,6 @@ func (r *Reader) ReadRune() (ch rune, size int, err error)     { return r.br.Rea
 func (r *Reader) Seek(offset int64, whence int) (int64, error) { return r.br.Seek(offset, whence) }
 func (r *Reader) WriteTo(w io.Writer) (int64, error)           { return r.br.WriteTo(w) }
 
-// TODO: add Reader.WriteTo, but don't use strings.Reader.WriteTo because it uses io.WriteString, leaking our unsafe string
-
 // unsafeString is a string that's not really a Go string.
 // It might be pointing into a []byte. Don't let it escape to callers.
 // We contain the unsafety to this package.
