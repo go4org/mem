@@ -20,9 +20,9 @@ package mem // import "go4.org/mem"
 
 import (
 	"hash/maphash"
+	"io"
 	"strconv"
 	"strings"
-	"sync"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -51,6 +51,12 @@ type RO struct {
 // obey the language/runtime's expectations of a real string (it can
 // change underfoot).
 func (r RO) str() string { return string(r.m) }
+
+func (r RO) bytes() []byte {
+	s := r.str()
+	d := unsafe.StringData(s)
+	return unsafe.Slice(d, len(s))
+}
 
 // Len returns len(r).
 func (r RO) Len() int { return len(r.m) }
@@ -86,19 +92,14 @@ func (r RO) EqualBytes(b []byte) bool { return r.str() == string(b) }
 // Less reports whether r < r2.
 func (r RO) Less(r2 RO) bool { return r.str() < r2.str() }
 
-var builderPool = sync.Pool{
-	New: func() interface{} {
-		return new(strings.Builder)
-	},
+func (r RO) WriteTo(w io.Writer) (int64, error) {
+	n, err := w.Write(r.bytes())
+	return int64(n), err
 }
 
 // StringCopy returns m's contents in a newly allocated string.
 func (r RO) StringCopy() string {
-	buf := builderPool.Get().(*strings.Builder)
-	defer builderPool.Put(buf)
-	defer buf.Reset()
-	buf.WriteString(r.str())
-	return buf.String()
+	return string(r.bytes())
 }
 
 var seed = maphash.MakeSeed()
@@ -301,6 +302,7 @@ func (r *Reader) ReadAt(b []byte, off int64) (int, error)      { return r.sr.Rea
 func (r *Reader) ReadByte() (byte, error)                      { return r.sr.ReadByte() }
 func (r *Reader) ReadRune() (ch rune, size int, err error)     { return r.sr.ReadRune() }
 func (r *Reader) Seek(offset int64, whence int) (int64, error) { return r.sr.Seek(offset, whence) }
+func (r *Reader) WriteTo(w io.Writer) (int64, error)           { return r.sr.WriteTo(w) }
 
 // TODO: add Reader.WriteTo, but don't use strings.Reader.WriteTo because it uses io.WriteString, leaking our unsafe string
 

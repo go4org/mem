@@ -16,7 +16,10 @@ limitations under the License.
 
 package mem
 
-import "testing"
+import (
+	"io"
+	"testing"
+)
 
 func TestRO(t *testing.T) {
 	b := []byte("some memory.")
@@ -57,6 +60,14 @@ func TestRO(t *testing.T) {
 	b[0] = 'z'
 	if rb.At(0) != 'z' {
 		t.Fatalf("[0] = %q; want 'z'", rb.At(0))
+	}
+
+	var b2 = []byte("b2")
+	bb := B(b2)
+	s = bb.StringCopy()
+	b2[0] = '0'
+	if s != "b2" {
+		t.Fatalf(".StringCopy() is not actually copy, got %q; want %q", s, "b2")
 	}
 
 	var got []byte
@@ -189,5 +200,21 @@ func BenchmarkHash(b *testing.B) {
 		if x != ro.MapHash() {
 			b.Fatal("hash changed")
 		}
+	}
+}
+
+func BenchmarkWriteTo(b *testing.B) {
+	b.ReportAllocs()
+	ro := S("A man with a beard was always a little suspect anyway.")
+	for i := 0; i < b.N; i++ {
+		ro.WriteTo(io.Discard)
+	}
+}
+
+func BenchmarkReader(b *testing.B) {
+	b.ReportAllocs()
+	ro := S("A man with a beard was always a little suspect anyway.")
+	for i := 0; i < b.N; i++ {
+		io.Copy(io.Discard, NewReader(ro))
 	}
 }
