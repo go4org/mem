@@ -52,12 +52,6 @@ type RO struct {
 // change underfoot).
 func (r RO) str() string { return string(r.m) }
 
-func (r RO) bytes() []byte {
-	s := r.str()
-	d := unsafe.StringData(s)
-	return unsafe.Slice(d, len(s))
-}
-
 // Len returns len(r).
 func (r RO) Len() int { return len(r.m) }
 
