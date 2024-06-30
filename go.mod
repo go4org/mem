@@ -1,3 +1,3 @@
 module go4.org/mem
 
-go 1.20
+go 1.14
