@@ -28,6 +28,7 @@ var faces = "☺☻☹"
 type FieldsTest struct {
 	s string
 	a []string
+	_ [24]byte
 }
 
 var fieldstests = []FieldsTest{

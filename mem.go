@@ -43,7 +43,6 @@ import (
 // RO backed by a later-mutating []byte doesn't break invariants in
 // Go's map implementation.
 type RO struct {
-	_ [0]func() // not comparable; don't want to be a map key or support ==
 	m unsafeString
 }
 
