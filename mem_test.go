@@ -210,7 +210,7 @@ func (discordWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-var discord = discordWriter{}
+var discord io.Writer = discordWriter{}
 
 func BenchmarkWriteTo(b *testing.B) {
 	b.ReportAllocs()

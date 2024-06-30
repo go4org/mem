@@ -19,6 +19,7 @@ limitations under the License.
 package mem // import "go4.org/mem"
 
 import (
+	"bytes"
 	"hash/maphash"
 	"io"
 	"strconv"
@@ -257,7 +258,7 @@ func ValidUTF8(m RO) bool {
 
 // NewReader returns a new Reader that reads from m.
 func NewReader(m RO) *Reader {
-	return &Reader{sr: strings.NewReader(m.str())}
+	return &Reader{br: bytes.NewReader(m.bytes())}
 }
 
 // Cut works like strings.Cut, but takes and returns ROs.
@@ -286,17 +287,17 @@ func CutSuffix(m, suffix RO) (before RO, found bool) {
 
 // Reader is like a bytes.Reader or strings.Reader.
 type Reader struct {
-	sr *strings.Reader
+	br *bytes.Reader
 }
 
-func (r *Reader) Len() int                                     { return r.sr.Len() }
-func (r *Reader) Size() int64                                  { return r.sr.Size() }
-func (r *Reader) Read(b []byte) (int, error)                   { return r.sr.Read(b) }
-func (r *Reader) ReadAt(b []byte, off int64) (int, error)      { return r.sr.ReadAt(b, off) }
-func (r *Reader) ReadByte() (byte, error)                      { return r.sr.ReadByte() }
-func (r *Reader) ReadRune() (ch rune, size int, err error)     { return r.sr.ReadRune() }
-func (r *Reader) Seek(offset int64, whence int) (int64, error) { return r.sr.Seek(offset, whence) }
-func (r *Reader) WriteTo(w io.Writer) (int64, error)           { return r.sr.WriteTo(w) }
+func (r *Reader) Len() int                                     { return r.br.Len() }
+func (r *Reader) Size() int64                                  { return r.br.Size() }
+func (r *Reader) Read(b []byte) (int, error)                   { return r.br.Read(b) }
+func (r *Reader) ReadAt(b []byte, off int64) (int, error)      { return r.br.ReadAt(b, off) }
+func (r *Reader) ReadByte() (byte, error)                      { return r.br.ReadByte() }
+func (r *Reader) ReadRune() (ch rune, size int, err error)     { return r.br.ReadRune() }
+func (r *Reader) Seek(offset int64, whence int) (int64, error) { return r.br.Seek(offset, whence) }
+func (r *Reader) WriteTo(w io.Writer) (int64, error)           { return r.br.WriteTo(w) }
 
 // TODO: add Reader.WriteTo, but don't use strings.Reader.WriteTo because it uses io.WriteString, leaking our unsafe string
 
