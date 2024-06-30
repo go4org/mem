@@ -19,11 +19,8 @@ package mem // import "go4.org/mem"
 import "testing"
 
 type foldTest struct {
-	a    string
-	b    string
+	a, b string
 	want bool
-	_    [7]byte
-	_    [24]byte
 }
 
 func TestContainsFold(t *testing.T) {
