@@ -203,11 +203,20 @@ func BenchmarkHash(b *testing.B) {
 	}
 }
 
+// very old go like 1.14 doesn't have io.Discard
+type discordWriter struct{}
+
+func (discordWriter) Write(p []byte) (int, error) {
+	return len(p), nil
+}
+
+var discord = discordWriter{}
+
 func BenchmarkWriteTo(b *testing.B) {
 	b.ReportAllocs()
 	ro := S("A man with a beard was always a little suspect anyway.")
 	for i := 0; i < b.N; i++ {
-		ro.WriteTo(io.Discard)
+		ro.WriteTo(discord)
 	}
 }
 
@@ -215,6 +224,6 @@ func BenchmarkReader(b *testing.B) {
 	b.ReportAllocs()
 	ro := S("A man with a beard was always a little suspect anyway.")
 	for i := 0; i < b.N; i++ {
-		io.Copy(io.Discard, NewReader(ro))
+		io.Copy(discord, NewReader(ro))
 	}
 }

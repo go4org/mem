@@ -10,5 +10,9 @@ import (
 
 func (r RO) bytes() []byte {
 	s := r.str()
-	return unsafe.Slice((*byte)(unsafe.Pointer((*reflect.StringHeader)(unsafe.Pointer(&s)).Data)), len(s))
+	return *(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+		Len:  len(s),
+		Cap:  len(s),
+		Data: (*(*reflect.StringHeader)(unsafe.Pointer(&s))).Data,
+	}))
 }
