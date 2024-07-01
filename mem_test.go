@@ -205,7 +205,6 @@ func BenchmarkHash(b *testing.B) {
 
 // ioutil.Discard was changed to io.Discard from go 1.16; so this is in part for compatibility.
 // Also, we limit our implementation to io.Writer for more narrow and specific testing.
-// but ioutil.Discard are deprecated after 1.16.
 type discardWriter struct{}
 
 func (discardWriter) Write(p []byte) (int, error) {
