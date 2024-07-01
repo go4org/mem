@@ -210,13 +210,13 @@ func (discardWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-var discord io.Writer = discardWriter{}
+var discard io.Writer = discardWriter{}
 
 func BenchmarkWriteTo(b *testing.B) {
 	b.ReportAllocs()
 	ro := S("A man with a beard was always a little suspect anyway.")
 	for i := 0; i < b.N; i++ {
-		ro.WriteTo(discord)
+		ro.WriteTo(discard)
 	}
 }
 
@@ -224,6 +224,6 @@ func BenchmarkReader(b *testing.B) {
 	b.ReportAllocs()
 	ro := S("A man with a beard was always a little suspect anyway.")
 	for i := 0; i < b.N; i++ {
-		io.Copy(discord, NewReader(ro))
+		io.Copy(discard, NewReader(ro))
 	}
 }
