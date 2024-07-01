@@ -204,13 +204,13 @@ func BenchmarkHash(b *testing.B) {
 }
 
 // very old go like 1.14 doesn't have io.Discard
-type discordWriter struct{}
+type discardWriter struct{}
 
-func (discordWriter) Write(p []byte) (int, error) {
+func (discardWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-var discord io.Writer = discordWriter{}
+var discord io.Writer = discardWriter{}
 
 func BenchmarkWriteTo(b *testing.B) {
 	b.ReportAllocs()
