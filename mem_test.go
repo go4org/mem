@@ -203,7 +203,8 @@ func BenchmarkHash(b *testing.B) {
 	}
 }
 
-// very old go like 1.14 doesn't have io.Discard
+// very old go like 1.14 doesn't have io.Discard,
+// but ioutil.Discard are deprecated after 1.16.
 type discardWriter struct{}
 
 func (discardWriter) Write(p []byte) (int, error) {
