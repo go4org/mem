@@ -87,9 +87,8 @@ func (r RO) EqualBytes(b []byte) bool { return r.str() == string(b) }
 // Less reports whether r < r2.
 func (r RO) Less(r2 RO) bool { return r.str() < r2.str() }
 
-func (r RO) WriteTo(w io.Writer) (int64, error) {
-	n, err := w.Write(r.bytes())
-	return int64(n), err
+func (r RO) WriteTo(w io.Writer) (int, error) {
+	return w.Write(r.bytes())
 }
 
 // StringCopy returns m's contents in a newly allocated string.
